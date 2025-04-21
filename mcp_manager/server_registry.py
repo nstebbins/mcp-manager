@@ -8,8 +8,10 @@ Each server entry contains:
 - dependencies: List of dependencies required
 """
 
+import json
 import os
-from typing import Dict, List, Optional
+from pathlib import Path
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -24,7 +26,7 @@ class ClaudeConfig(BaseModel):
 
     def model_dump(self, **kwargs):
         data = super().model_dump(**kwargs)
-        if data.get("env") is None:
+        if "env" in data and data["env"] is None:
             del data["env"]
         return data
 
@@ -71,6 +73,16 @@ MCP_SERVERS: Dict[str, MCPServer] = {
         claude_config=ClaudeConfig(
             command="docker",
             args=["run", "-i", "--rm", "mcp/fetch"],
+        ),
+        required_config=[],
+        dependencies=["Docker"],
+    ),
+    "memory": MCPServer(
+        description="MCP server for managing Claude's memory",
+        maintainer="MCP",
+        claude_config=ClaudeConfig(
+            command="docker",
+            args=["run", "-i", "-v", "claude-memory:/app/dist", "--rm", "mcp/memory"],
         ),
         required_config=[],
         dependencies=["Docker"],
@@ -146,3 +158,47 @@ def get_claude_config(server_name: str) -> Optional[Dict]:
     if not server_info:
         return None
     return server_info.claude_config.model_dump(exclude_none=True)
+
+
+def get_config_path() -> Path:
+    """
+    Get the Claude config file path, taking into account any custom path set by the user.
+    """
+    # Check for custom path
+    custom_path_file = Path(os.path.expanduser("~/.mcp_manager_config"))
+    if custom_path_file.exists():
+        with custom_path_file.open() as f:
+            return Path(f.read().strip())
+
+    # Return default path
+    return Path(os.path.expanduser("~/Library/Application Support/Claude/claude_desktop_config.json"))
+
+
+def get_installed_servers() -> List[Dict[str, Union[str, Dict]]]:
+    """
+    Get list of installed MCP servers from Claude config.
+    """
+    installed = []
+    config_file = get_config_path()
+
+    if config_file.exists():
+        with open(config_file, "r") as f:
+            try:
+                config = json.load(f)
+                mcp_servers = config.get("mcpServers", {})
+
+                for name, server_config in mcp_servers.items():
+                    server_info = get_server_info(name)
+                    if server_info:
+                        installed.append(
+                            {
+                                "name": name,
+                                "description": server_info.description,
+                                "maintainer": server_info.maintainer,
+                                "config": server_config,
+                            }
+                        )
+            except json.JSONDecodeError:
+                pass
+
+    return installed

@@ -4,7 +4,6 @@
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://pypi.org/project/mcp-manager/)
 [![Python](https://img.shields.io/badge/python-^3.12-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 A powerful CLI tool for managing Model Context Protocol (MCP) servers. Seamlessly install, configure, and manage MCP servers for AI tools and services.
 
@@ -47,8 +46,11 @@ mcp-manager install playwright --client=claude
 |---------|-------------|
 | `search <keyword>` | Search for available MCP servers matching the keyword |
 | `info <server-name>` | Display detailed information about a specific server |
-| `install <server-name> [--client=claude]` | Install an MCP server for a specific client |
+| `install <server-name> [--client=claude] [--scope=global\|project]` | Install an MCP server for a specific client |
 | `uninstall <server-name> [--client=claude]` | Remove an installed server |
+| `list` | List all installed MCP servers |
+| `config path` | Show current Claude config file path |
+| `config set-path <new-path>` | Set a new path for the Claude config file |
 
 ## 🔌 Available Servers
 
@@ -58,6 +60,7 @@ mcp-manager install playwright --client=claude
 | **Filesystem** | File system operations server for local file access | Node.js, npm |
 | **Fetch** | Server for making HTTP requests | Docker |
 | **Git** | Server for Git operations | Docker |
+| **Memory** | Server for managing Claude's memory | Docker |
 
 ## 🎯 Features
 
@@ -126,10 +129,6 @@ poetry run pytest
 Currently supports:
 - ✅ Claude (primary client)
 - 🔄 Additional client support coming soon
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
