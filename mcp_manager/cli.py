@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 from enum import Enum
@@ -6,6 +7,7 @@ from typing import Optional
 
 import typer
 
+from .dependency_checker import check_dependencies
 from .server_registry import get_claude_config, get_server_info, search_servers
 
 app = typer.Typer()
@@ -89,11 +91,34 @@ def install(
         typer.echo("Currently only Claude installation is supported")
         return
 
+    # Check dependencies before proceeding
+    dependencies = server_info.dependencies
+    if dependencies:
+        all_installed, missing_deps = check_dependencies(dependencies)
+        if not all_installed:
+            typer.echo("Missing required dependencies:")
+            for dep in missing_deps:
+                typer.echo(f"- {dep}")
+            typer.echo("\nPlease install the missing dependencies and try again.")
+            return
+
     # Get Claude config
     claude_config = get_claude_config(server_name)
     if not claude_config:
         typer.echo(f"No Claude configuration available for server: {server_name}")
         return
+
+    # Handle user input if required
+    if server_info.requires_user_input:
+        if server_info.user_input_prompt:
+            user_input = typer.prompt(server_info.user_input_prompt)
+            # Make a deep copy to avoid modifying the original config
+            claude_config = copy.deepcopy(claude_config)
+            # Replace placeholder in args with user input
+            claude_config["args"] = [
+                arg.replace("{user_directory}", user_input) if isinstance(arg, str) else arg
+                for arg in claude_config["args"]
+            ]
 
     # Get Claude config file path
     config_dir = Path(os.path.expanduser("~/Library/Application Support/Claude"))
@@ -120,6 +145,51 @@ def install(
             json.dump(config, f, indent=2)
 
         typer.echo(f"Successfully installed {server_name} for Claude")
+
+    except Exception as e:
+        typer.echo(f"Error updating Claude config: {str(e)}")
+        return
+
+
+@app.command()
+def uninstall(
+    server_name: str,
+    client: Optional[ClientType] = client_option,
+):
+    """
+    Remove a server from the client configuration.
+    """
+    # For now, we only support Claude deletion
+    if client and client != ClientType.CLAUDE:
+        typer.echo("Currently only Claude deletion is supported")
+        return
+
+    # Get Claude config file path
+    config_dir = Path(os.path.expanduser("~/Library/Application Support/Claude"))
+    config_file = config_dir / "claude_desktop_config.json"
+
+    if not config_file.exists():
+        typer.echo(f"Claude config file not found at: {config_file}")
+        return
+
+    try:
+        # Read current config
+        with open(config_file) as f:
+            config = json.load(f)
+
+        # Check if mcpServers exists and server is in it
+        if "mcpServers" not in config or server_name not in config["mcpServers"]:
+            typer.echo(f"Server {server_name} is not installed in Claude config")
+            return
+
+        # Remove the server config
+        del config["mcpServers"][server_name]
+
+        # Write updated config
+        with open(config_file, "w") as f:
+            json.dump(config, f, indent=2)
+
+        typer.echo(f"Successfully removed {server_name} from Claude config")
 
     except Exception as e:
         typer.echo(f"Error updating Claude config: {str(e)}")

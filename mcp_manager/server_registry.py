@@ -9,27 +9,97 @@ Each server entry contains:
 """
 
 import os
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
-MCP_SERVERS: Dict[str, Dict[str, Any]] = {
-    "filesystem": {
-        "description": "MCP server for filesystem operations",
-        "maintainer": "Anthropic",
-        "claude_config": {
-            "command": "npx",
-            "args": [
+from pydantic import BaseModel, Field
+
+
+class ClaudeConfig(BaseModel):
+    command: str
+    args: List[str]
+    env: Optional[Dict[str, str]] = None
+
+    class Config:
+        json_encoders = {dict: lambda v: v or None}
+
+    def model_dump(self, **kwargs):
+        data = super().model_dump(**kwargs)
+        if data.get("env") is None:
+            del data["env"]
+        return data
+
+
+class MCPServer(BaseModel):
+    description: str
+    maintainer: str
+    claude_config: ClaudeConfig
+    required_config: List[str] = Field(default_factory=list)
+    dependencies: List[str] = Field(default_factory=list)
+    requires_user_input: bool = False
+    user_input_prompt: Optional[str] = None
+
+
+MCP_SERVERS: Dict[str, MCPServer] = {
+    "filesystem": MCPServer(
+        description="MCP server for filesystem operations",
+        maintainer="Anthropic",
+        claude_config=ClaudeConfig(
+            command="npx",
+            args=[
                 "-y",
                 "@modelcontextprotocol/server-filesystem",
                 os.path.expanduser("~/Documents"),  # Default to user's Documents folder
             ],
-        },
-        "required_config": ["Allowed directory paths that the server can access"],
-        "dependencies": ["Node.js", "npm"],
-    }
+        ),
+        required_config=["Allowed directory paths that the server can access"],
+        dependencies=["Node.js", "npm"],
+    ),
+    "playwright": MCPServer(
+        description="MCP server for browser automation with Playwright",
+        maintainer="Anthropic",
+        claude_config=ClaudeConfig(
+            command="npx",
+            args=["@playwright/mcp@latest"],
+            env={"PLAYWRIGHT_DEBUG": "1"},
+        ),
+        required_config=[],
+        dependencies=["Node.js", "npm"],
+    ),
+    "fetch": MCPServer(
+        description="MCP server for making HTTP requests",
+        maintainer="MCP",
+        claude_config=ClaudeConfig(
+            command="docker",
+            args=["run", "-i", "--rm", "mcp/fetch"],
+        ),
+        required_config=[],
+        dependencies=["Docker"],
+    ),
+    "git": MCPServer(
+        description="MCP server for Git operations",
+        maintainer="MCP",
+        claude_config=ClaudeConfig(
+            command="docker",
+            args=[
+                "run",
+                "--rm",
+                "-i",
+                "--mount",
+                "type=bind,src={user_directory},dst={user_directory}",
+                "mcp/git",
+            ],
+        ),
+        required_config=["Directory path to mount for Git operations"],
+        dependencies=["Docker"],
+        requires_user_input=True,
+        user_input_prompt=(
+            "Enter the directory path you want to make available to the MCP Server (absolute path only):"
+        ),
+    ),
 }
 
 
-def get_server_info(server_name: str) -> Optional[Dict[str, Any]]:
+def get_server_info(server_name: str) -> Optional[MCPServer]:
     """
     Get information about a specific server.
 
@@ -37,7 +107,7 @@ def get_server_info(server_name: str) -> Optional[Dict[str, Any]]:
         server_name: Name of the server to look up
 
     Returns:
-        Server information dictionary if found, None otherwise
+        Server information if found, None otherwise
     """
     return MCP_SERVERS.get(server_name)
 
@@ -56,13 +126,13 @@ def search_servers(keyword: str) -> List[str]:
     matches = []
 
     for name, info in MCP_SERVERS.items():
-        if keyword in name.lower() or keyword in info["description"].lower():
+        if keyword in name.lower() or keyword in info.description.lower():
             matches.append(name)
 
     return matches
 
 
-def get_claude_config(server_name: str) -> Optional[Dict[str, Any]]:
+def get_claude_config(server_name: str) -> Optional[Dict]:
     """
     Get the Claude configuration for a specific server.
 
@@ -75,4 +145,4 @@ def get_claude_config(server_name: str) -> Optional[Dict[str, Any]]:
     server_info = get_server_info(server_name)
     if not server_info:
         return None
-    return server_info.get("claude_config")
+    return server_info.claude_config.model_dump(exclude_none=True)
