@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "mcp-manager"
+version = "0.1.0"
+description = "A CLI tool for managing MCP servers"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "mcp_manager"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+click = "^8.1.8"
+typer = "^0.15.2"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.6"
+
+pre-commit = "^4.2.0"
+pytest = "^8.3.5"
+syrupy = "^4.9.1"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+mcp-manager = "mcp_manager.cli:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "B", "Q"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

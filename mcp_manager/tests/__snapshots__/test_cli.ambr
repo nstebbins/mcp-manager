@@ -1,0 +1,57 @@
+# serializer version: 1
+# name: test_info_command_existing
+  '''
+
+  Server: filesystem
+  Description: MCP server for filesystem operations
+  Maintainer: Anthropic
+
+  Required configuration:
+  - Allowed directory paths that the server can access
+
+  Dependencies:
+  - Node.js
+  - npm
+
+  '''
+# ---
+# name: test_info_command_nonexisting
+  '''
+  Server not found: nonexistent
+
+  '''
+# ---
+# name: test_install_command_nonexisting
+  '''
+  Server not found: nonexistent
+
+  '''
+# ---
+# name: test_install_command_success
+  '''
+  Successfully installed filesystem for Claude
+
+  '''
+# ---
+# name: test_install_command_unsupported_client
+  '''
+  Currently only Claude installation is supported
+
+  '''
+# ---
+# name: test_search_command_no_match
+  '''
+  No servers found matching: nonexistent
+
+  '''
+# ---
+# name: test_search_command_with_match
+  '''
+  Found 1 matching servers:
+
+  filesystem:
+    Description: MCP server for filesystem operations
+    Maintainer: Anthropic
+
+  '''
+# ---
