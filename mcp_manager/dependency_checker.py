@@ -59,15 +59,23 @@ def check_dependencies(dependencies: List[str]) -> Tuple[bool, List[str]]:
         Tuple of (all_installed: bool, missing_deps: List[str])
     """
     missing = []
+    checked_deps = set()  # Keep track of which dependencies we've already checked
 
     for dep in dependencies:
+        if dep in checked_deps:
+            continue
+
         if dep in ["Node.js", "npm"]:
-            installed, missing_deps = check_nodejs_npm()
-            if not installed:
-                missing.extend(missing_deps)
+            if not any(d in checked_deps for d in ["Node.js", "npm"]):
+                installed, missing_deps = check_nodejs_npm()
+                if not installed:
+                    missing.extend(missing_deps)
+                checked_deps.add("Node.js")
+                checked_deps.add("npm")
         elif dep == "Docker":
             installed, missing_deps = check_docker()
             if not installed:
                 missing.extend(missing_deps)
+            checked_deps.add("Docker")
 
     return len(missing) == 0, missing

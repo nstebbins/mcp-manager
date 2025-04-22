@@ -4,6 +4,7 @@
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://pypi.org/project/mcp-manager/)
 [![Python](https://img.shields.io/badge/python-^3.12-blue.svg)](https://www.python.org/downloads/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 A powerful CLI tool for managing Model Context Protocol (MCP) servers. Seamlessly install, configure, and manage MCP servers for AI tools and services.
 
