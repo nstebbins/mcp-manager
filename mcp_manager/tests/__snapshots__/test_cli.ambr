@@ -4,11 +4,9 @@
   Missing required dependencies:
   • Node.js
   • npm
-  • Node.js
-  • npm
-
+  
   Please install the missing dependencies and try again.
-
+  
   '''
 # ---
 # name: test_info_command_existing
@@ -18,18 +16,18 @@
   │ Description: MCP server for filesystem operations │
   │ Maintainer: Anthropic                             │
   ╰───────────────────────────────────────────────────╯
-                  Required Configuration
-   •  Allowed directory paths that the server can access
+                  Required Configuration                 
+   •  Allowed directory paths that the server can access 
   Dependencies
-   •  Node.js
-   •  npm
-
+   •  Node.js 
+   •  npm     
+  
   '''
 # ---
 # name: test_info_command_nonexisting
   '''
   Server not found: nonexistent
-
+  
   '''
 # ---
 # name: test_info_command_playwright
@@ -40,31 +38,31 @@
   │ Maintainer: Anthropic                                          │
   ╰────────────────────────────────────────────────────────────────╯
   Dependencies
-   •  Node.js
-   •  npm
-
+   •  Node.js 
+   •  npm     
+  
   '''
 # ---
 # name: test_install_command_nonexisting
   '''
   Server not found: nonexistent
-
+  
   '''
 # ---
 # name: test_search_command_no_match
   '''
   No servers found matching: nonexistent
-
+  
   '''
 # ---
 # name: test_search_command_with_match
   '''
-                       Found 1 matching servers
+                       Found 1 matching servers                     
   ┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
   ┃ Server     ┃ Description                          ┃ Maintainer ┃
   ┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
   │ filesystem │ MCP server for filesystem operations │ Anthropic  │
   └────────────┴──────────────────────────────────────┴────────────┘
-
+  
   '''
 # ---

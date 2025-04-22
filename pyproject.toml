@@ -30,6 +30,7 @@ mcp-manager = "mcp_manager.cli:main"
 [tool.ruff]
 line-length = 105
 target-version = "py312"
+exclude = ["*.ambr"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "B", "Q"]
