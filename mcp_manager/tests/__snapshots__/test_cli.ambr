@@ -51,12 +51,6 @@
 
   '''
 # ---
-# name: test_install_command_unsupported_client
-  '''
-  Currently only Claude installation is supported
-
-  '''
-# ---
 # name: test_search_command_no_match
   '''
   No servers found matching: nonexistent

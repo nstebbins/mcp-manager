@@ -13,16 +13,15 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class ClaudeConfig(BaseModel):
+class MCPConfig(BaseModel):
     command: str
     args: List[str]
     env: Optional[Dict[str, str]] = None
 
-    class Config:
-        json_encoders = {dict: lambda v: v or None}
+    model_config = ConfigDict(json_encoders={dict: lambda v: v or None})
 
     def model_dump(self, **kwargs):
         data = super().model_dump(**kwargs)
@@ -34,7 +33,7 @@ class ClaudeConfig(BaseModel):
 class MCPServer(BaseModel):
     description: str
     maintainer: str
-    claude_config: ClaudeConfig
+    mcp_config: MCPConfig
     required_config: List[str] = Field(default_factory=list)
     dependencies: List[str] = Field(default_factory=list)
     requires_user_input: bool = False
@@ -45,7 +44,7 @@ MCP_SERVERS: Dict[str, MCPServer] = {
     "filesystem": MCPServer(
         description="MCP server for filesystem operations",
         maintainer="Anthropic",
-        claude_config=ClaudeConfig(
+        mcp_config=MCPConfig(
             command="npx",
             args=[
                 "-y",
@@ -59,7 +58,7 @@ MCP_SERVERS: Dict[str, MCPServer] = {
     "playwright": MCPServer(
         description="MCP server for browser automation with Playwright",
         maintainer="Anthropic",
-        claude_config=ClaudeConfig(
+        mcp_config=MCPConfig(
             command="npx",
             args=["@playwright/mcp@latest"],
             env={"PLAYWRIGHT_DEBUG": "1"},
@@ -70,7 +69,7 @@ MCP_SERVERS: Dict[str, MCPServer] = {
     "fetch": MCPServer(
         description="MCP server for making HTTP requests",
         maintainer="MCP",
-        claude_config=ClaudeConfig(
+        mcp_config=MCPConfig(
             command="docker",
             args=["run", "-i", "--rm", "mcp/fetch"],
         ),
@@ -80,7 +79,7 @@ MCP_SERVERS: Dict[str, MCPServer] = {
     "memory": MCPServer(
         description="MCP server for managing Claude's memory",
         maintainer="MCP",
-        claude_config=ClaudeConfig(
+        mcp_config=MCPConfig(
             command="docker",
             args=["run", "-i", "-v", "claude-memory:/app/dist", "--rm", "mcp/memory"],
         ),
@@ -90,7 +89,7 @@ MCP_SERVERS: Dict[str, MCPServer] = {
     "git": MCPServer(
         description="MCP server for Git operations",
         maintainer="MCP",
-        claude_config=ClaudeConfig(
+        mcp_config=MCPConfig(
             command="docker",
             args=[
                 "run",
@@ -144,42 +143,47 @@ def search_servers(keyword: str) -> List[str]:
     return matches
 
 
-def get_claude_config(server_name: str) -> Optional[Dict]:
+def get_mcp_config(server_name: str) -> Optional[Dict]:
     """
-    Get the Claude configuration for a specific server.
+    Get the MCP configuration for a specific server.
 
     Args:
         server_name: Name of the server to get config for
 
     Returns:
-        Claude configuration dictionary if found, None otherwise
+        MCP configuration dictionary if found, None otherwise
     """
     server_info = get_server_info(server_name)
     if not server_info:
         return None
-    return server_info.claude_config.model_dump(exclude_none=True)
+    return server_info.mcp_config.model_dump(exclude_none=True)
 
 
-def get_config_path() -> Path:
+def get_config_path(client: str = "claude") -> Path:
     """
-    Get the Claude config file path, taking into account any custom path set by the user.
+    Get the config file path for the specified client.
     """
     # Check for custom path
-    custom_path_file = Path(os.path.expanduser("~/.mcp_manager_config"))
+    custom_path_file = Path(os.path.expanduser(f"~/.mcp_manager_{client}_config"))
     if custom_path_file.exists():
         with custom_path_file.open() as f:
             return Path(f.read().strip())
 
-    # Return default path
-    return Path(os.path.expanduser("~/Library/Application Support/Claude/claude_desktop_config.json"))
+    # Return default path based on client
+    if client == "cursor":
+        return Path(os.path.expanduser("~/.cursor/mcp.json"))
+    else:  # claude is default
+        return Path(
+            os.path.expanduser("~/Library/Application Support/Claude/claude_desktop_config.json")
+        )
 
 
-def get_installed_servers() -> List[Dict[str, Union[str, Dict]]]:
+def get_installed_servers(client: str = "claude") -> List[Dict[str, Union[str, Dict]]]:
     """
-    Get list of installed MCP servers from Claude config.
+    Get list of installed MCP servers from client config.
     """
     installed = []
-    config_file = get_config_path()
+    config_file = get_config_path(client)
 
     if config_file.exists():
         with open(config_file, "r") as f:

@@ -3,17 +3,28 @@
 Command-line tool to list installed MCP servers.
 """
 
+import argparse
+
 from server_registry import get_installed_servers
 
 
 def main():
-    installed_servers = get_installed_servers()
+    parser = argparse.ArgumentParser(description="List installed MCP servers")
+    parser.add_argument(
+        "--client",
+        choices=["claude", "cursor"],
+        default="claude",
+        help="Client to list servers for (default: claude)",
+    )
+    args = parser.parse_args()
+
+    installed_servers = get_installed_servers(args.client)
 
     if not installed_servers:
-        print("No MCP servers found in Claude configuration.")
+        print(f"No MCP servers found in {args.client} configuration.")
         return
 
-    print("\nInstalled MCP Servers:")
+    print(f"\nInstalled MCP Servers for {args.client}:")
     print("=" * 80)
 
     for server in installed_servers:

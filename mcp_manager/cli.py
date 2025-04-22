@@ -12,16 +12,16 @@ from rich.table import Table
 
 from .dependency_checker import check_dependencies
 from .server_registry import (
-    get_claude_config,
     get_config_path,
     get_installed_servers,
+    get_mcp_config,
     get_server_info,
     search_servers,
 )
 
 app = typer.Typer()
 config_app = typer.Typer()
-app.add_typer(config_app, name="config", help="Manage Claude configuration")
+app.add_typer(config_app, name="config", help="Manage client configuration")
 
 console = Console()
 
@@ -31,14 +31,8 @@ class ClientType(str, Enum):
     CLAUDE = "claude"
 
 
-class ScopeType(str, Enum):
-    GLOBAL = "global"
-    PROJECT = "project"
-
-
 # Define options at module level
-client_option = typer.Option(None, help="Client type (cursor or claude)")
-scope_option = typer.Option(None, help="Installation scope (global or project)")
+client_option = typer.Option(ClientType.CLAUDE, help="Client type (cursor or claude)")
 
 
 @app.command()
@@ -101,18 +95,13 @@ def info(server_name: str):
 def install(
     server_name: str,
     client: Optional[ClientType] = client_option,
-    scope: Optional[ScopeType] = scope_option,
 ):
     """
-    Install a server with optional client type and scope specifications.
+    Install a server for the specified client.
     """
     server_info = get_server_info(server_name)
     if not server_info:
         console.print(f"[red]Server not found:[/red] {server_name}")
-        return
-
-    if client and client != ClientType.CLAUDE:
-        console.print("[yellow]Currently only Claude installation is supported[/yellow]")
         return
 
     dependencies = server_info.dependencies
@@ -125,22 +114,22 @@ def install(
             console.print("\n[yellow]Please install the missing dependencies and try again.[/yellow]")
             return
 
-    claude_config = get_claude_config(server_name)
-    if not claude_config:
-        console.print(f"[red]No Claude configuration available for server:[/red] {server_name}")
+    mcp_config = get_mcp_config(server_name)
+    if not mcp_config:
+        console.print(f"[red]No MCP configuration available for server:[/red] {server_name}")
         return
 
     if server_info.requires_user_input and server_info.user_input_prompt:
         user_input = typer.prompt(server_info.user_input_prompt)
-        claude_config = copy.deepcopy(claude_config)
-        claude_config["args"] = [
+        mcp_config = copy.deepcopy(mcp_config)
+        mcp_config["args"] = [
             arg.replace("{user_directory}", user_input) if isinstance(arg, str) else arg
-            for arg in claude_config["args"]
+            for arg in mcp_config["args"]
         ]
 
-    config_file = get_config_path()
+    config_file = get_config_path(client)
     if not config_file.exists():
-        console.print(f"[red]Claude config file not found at:[/red] {config_file}")
+        console.print(f"[red]Config file not found at:[/red] {config_file}")
         return
 
     try:
@@ -150,15 +139,15 @@ def install(
         if "mcpServers" not in config:
             config["mcpServers"] = {}
 
-        config["mcpServers"][server_name] = claude_config
+        config["mcpServers"][server_name] = mcp_config
 
         with open(config_file, "w") as f:
             json.dump(config, f, indent=2)
 
-        console.print(f"[green]Successfully installed[/green] {server_name} for Claude")
+        console.print(f"[green]Successfully installed[/green] {server_name} for {client.value}")
 
     except Exception as e:
-        console.print(f"[red]Error updating Claude config:[/red] {str(e)}")
+        console.print(f"[red]Error updating {client.value} config:[/red] {str(e)}")
         return
 
 
@@ -170,56 +159,46 @@ def uninstall(
     """
     Remove a server from the client configuration.
     """
-    # For now, we only support Claude deletion
-    if client and client != ClientType.CLAUDE:
-        typer.echo("Currently only Claude deletion is supported")
-        return
-
-    # Get Claude config file path
-    config_file = get_config_path()
+    config_file = get_config_path(client)
 
     if not config_file.exists():
-        typer.echo(f"Claude config file not found at: {config_file}")
+        console.print(f"[red]Config file not found at:[/red] {config_file}")
         return
 
     try:
-        # Read current config
         with open(config_file) as f:
             config = json.load(f)
 
-        # Check if mcpServers exists and server is in it
         if "mcpServers" not in config or server_name not in config["mcpServers"]:
-            typer.echo(f"Server {server_name} is not installed in Claude config")
+            console.print(f"[red]Server {server_name} is not installed in {client.value} config[/red]")
             return
 
-        # Remove the server config
         del config["mcpServers"][server_name]
 
-        # Write updated config
         with open(config_file, "w") as f:
             json.dump(config, f, indent=2)
 
-        typer.echo(f"Successfully removed {server_name} from Claude config")
+        console.print(f"[green]Successfully removed[/green] {server_name} from {client.value} config")
 
     except Exception as e:
-        typer.echo(f"Error updating Claude config: {str(e)}")
+        console.print(f"[red]Error updating {client.value} config:[/red] {str(e)}")
         return
 
 
 @config_app.command("path")
-def config_path():
+def config_path(client: Optional[ClientType] = client_option):
     """
-    Show current Claude config file path.
+    Show current client config file path.
     """
-    config_file = get_config_path()
-    typer.echo(f"Current config path: {config_file}")
-    typer.echo(f"Config exists: {config_file.exists()}")
+    config_file = get_config_path(client)
+    console.print(f"Current {client.value} config path: {config_file}")
+    console.print(f"Config exists: {config_file.exists()}")
 
 
 @config_app.command("set-path")
-def set_config_path(new_path: str):
+def set_config_path(new_path: str, client: Optional[ClientType] = client_option):
     """
-    Set a new path for the Claude config file.
+    Set a new path for the client config file.
     """
     new_path = Path(os.path.expanduser(new_path))
 
@@ -227,12 +206,12 @@ def set_config_path(new_path: str):
     new_path.parent.mkdir(parents=True, exist_ok=True)
 
     # If old config exists, copy it to new location
-    old_config = get_config_path()
+    old_config = get_config_path(client)
     if old_config.exists():
         if new_path.exists():
             overwrite = typer.confirm("Config file already exists at new location. Overwrite?")
             if not overwrite:
-                typer.echo("Operation cancelled")
+                console.print("Operation cancelled")
                 return
         with old_config.open() as f:
             config = json.load(f)
@@ -240,25 +219,27 @@ def set_config_path(new_path: str):
             json.dump(config, f, indent=2)
 
     # Store the custom path in user's home directory
-    custom_path_file = Path(os.path.expanduser("~/.mcp_manager_config"))
+    custom_path_file = Path(os.path.expanduser(f"~/.mcp_manager_{client.value}_config"))
     with custom_path_file.open("w") as f:
         f.write(str(new_path))
 
-    typer.echo(f"Successfully set new config path to: {new_path}")
+    console.print(f"[green]Successfully set new {client.value} config path to:[/green] {new_path}")
 
 
 @app.command()
-def list():
+def list(client: Optional[ClientType] = client_option):
     """
     List all installed MCP servers.
     """
-    installed_servers = get_installed_servers()
+    installed_servers = get_installed_servers(client)
 
     if not installed_servers:
-        console.print("[yellow]No MCP servers are currently installed.[/yellow]")
+        console.print(f"[yellow]No MCP servers are currently installed for {client.value}.[/yellow]")
         return
 
-    table = Table(title="Installed MCP Servers", show_header=True, header_style="bold magenta")
+    table = Table(
+        title=f"Installed MCP Servers for {client.value}", show_header=True, header_style="bold magenta"
+    )
     table.add_column("Server Name", style="cyan")
     table.add_column("Description")
     table.add_column("Maintainer", style="green")

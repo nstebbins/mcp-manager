@@ -1,13 +1,13 @@
-# MCP Manager
-
 <div align="center">
+
+# MCP Manager
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://pypi.org/project/mcp-manager/)
 [![Python](https://img.shields.io/badge/python-^3.12-blue.svg)](https://www.python.org/downloads/)
 
 A powerful CLI tool for managing Model Context Protocol (MCP) servers. Seamlessly install, configure, and manage MCP servers for AI tools and services.
 
-[Installation](#installation) • [Quick Start](#quick-start) • [Available Servers](#available-servers) • [Development](#development)
+[Installation](#-installation) • [Quick Start](#-quick-start) • [Available Servers](#-available-servers) • [Supported MCP Clients](#-supported-mcp-clients)
 
 </div>
 
@@ -19,25 +19,29 @@ pip install mcp-manager
 
 # Search for available servers
 mcp-manager search browser
-# Output:
-#   Found 1 matching servers:
-#   playwright:
-#     Description: MCP server for browser automation with Playwright
-#     Maintainer: Anthropic
+# ┌───────────┬──────────────────────────────────────────────┬────────────┐
+# │ Server    │ Description                                  │ Maintainer │
+# ├───────────┼──────────────────────────────────────────────┼────────────┤
+# │ playwright│ MCP server for browser automation            │ Anthropic  │
+# └───────────┴──────────────────────────────────────────────┴────────────┘
 
 # Get detailed server information
 mcp-manager info playwright
-# Output:
-#   Server: playwright
-#   Description: MCP server for browser automation with Playwright
-#   Maintainer: Anthropic
-#   Dependencies:
-#   - Node.js
-#   - npm
+# ╭────────────────────── Server Information ──────────────────────╮
+# │ Server: playwright                                             │
+# │ Description: MCP server for browser automation with Playwright │
+# │ Maintainer: Anthropic                                          │
+# ╰────────────────────────────────────────────────────────────────╯
+# Dependencies
+#  •  Node.js
+#  •  npm
 
-# Install a server
+# Install a server (for Claude Desktop)
 mcp-manager install playwright --client=claude
-# Output: Successfully installed playwright for Claude
+
+
+# Install a server (for Cursor)
+mcp-manager install playwright --client=cursor
 ```
 
 ## 🛠️ Available Commands
@@ -46,11 +50,11 @@ mcp-manager install playwright --client=claude
 |---------|-------------|
 | `search <keyword>` | Search for available MCP servers matching the keyword |
 | `info <server-name>` | Display detailed information about a specific server |
-| `install <server-name> [--client=claude] [--scope=global\|project]` | Install an MCP server for a specific client |
-| `uninstall <server-name> [--client=claude]` | Remove an installed server |
+| `install <server-name> [--client=claude\|cursor]` | Install an MCP server for a specific client |
+| `uninstall <server-name> [--client=claude\|cursor]` | Remove an installed server |
 | `list` | List all installed MCP servers |
-| `config path` | Show current Claude config file path |
-| `config set-path <new-path>` | Set a new path for the Claude config file |
+| `config path [--client=claude\|cursor]` | Show current client config file path |
+| `config set-path <new-path> [--client=claude\|cursor]` | Set a new path for the client config file |
 
 ## 🔌 Available Servers
 
@@ -61,6 +65,13 @@ mcp-manager install playwright --client=claude
 | **Fetch** | Server for making HTTP requests | Docker |
 | **Git** | Server for Git operations | Docker |
 | **Memory** | Server for managing Claude's memory | Docker |
+
+## 👥 Supported MCP Clients
+
+Currently supports:
+- ✅ Claude Desktop (default client)
+- ✅ Cursor
+- 🔄 Additional client support coming soon
 
 ## 🎯 Features
 
@@ -80,23 +91,13 @@ pip install mcp-manager
 For developers:
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/mcp-manager.git
+git clone https://github.com/nstebbins/mcp-manager.git
 cd mcp-manager
 
 # Install dependencies and development tools
 poetry install
 pre-commit install  # Install git hooks
 ```
-
-## 🔧 Development
-
-This project leverages modern Python tools and practices:
-
-- **Poetry** - Dependency management and packaging
-- **Typer** - CLI interface framework
-- **Pydantic** - Data validation
-- **Ruff** - Lightning-fast Python linter and formatter
-- **Pre-commit** - Git hooks for code quality
 
 ### Code Quality
 
@@ -123,12 +124,6 @@ The project uses pytest for testing. Run the test suite with:
 ```bash
 poetry run pytest
 ```
-
-## 📦 Client Support
-
-Currently supports:
-- ✅ Claude (primary client)
-- 🔄 Additional client support coming soon
 
 ## 🤝 Contributing
 
