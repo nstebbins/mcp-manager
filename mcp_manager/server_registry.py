@@ -107,6 +107,26 @@ MCP_SERVERS: Dict[str, MCPServer] = {
             "Enter the directory path you want to make available to the MCP Server (absolute path only):"
         ),
     ),
+    "github": MCPServer(
+        description="MCP server for GitHub operations and API access",
+        maintainer="GitHub",
+        mcp_config=MCPConfig(
+            command="docker",
+            args=[
+                "run",
+                "-i",
+                "--rm",
+                "-e",
+                "GITHUB_PERSONAL_ACCESS_TOKEN",
+                "ghcr.io/github/github-mcp-server",
+            ],
+            env={"GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"},
+        ),
+        required_config=["GitHub Personal Access Token with desired permissions"],
+        dependencies=["Docker"],
+        requires_user_input=True,
+        user_input_prompt="Enter your GitHub Personal Access Token (create one at https://github.com/settings/tokens):",
+    ),
 }
 
 
@@ -159,7 +179,7 @@ def get_mcp_config(server_name: str) -> Optional[Dict]:
     return server_info.mcp_config.model_dump(exclude_none=True)
 
 
-def get_config_path(client: str = "claude") -> Path:
+def get_config_path(client: str = "claude-desktop") -> Path:
     """
     Get the config file path for the specified client.
     """
@@ -172,13 +192,15 @@ def get_config_path(client: str = "claude") -> Path:
     # Return default path based on client
     if client == "cursor":
         return Path(os.path.expanduser("~/.cursor/mcp.json"))
-    else:  # claude is default
+    elif client == "claude-code":
+        return Path(os.path.expanduser("~/.claude.json"))
+    else:  # claude-desktop is default
         return Path(
             os.path.expanduser("~/Library/Application Support/Claude/claude_desktop_config.json")
         )
 
 
-def get_installed_servers(client: str = "claude") -> List[Dict[str, Union[str, Dict]]]:
+def get_installed_servers(client: str = "claude-desktop") -> List[Dict[str, Union[str, Dict]]]:
     """
     Get list of installed MCP servers from client config.
     """

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mcp-manager"
-version = "0.1.0"
+version = "0.1.1"
 description = "A CLI tool for managing Model Context Protocol (MCP) servers"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
@@ -16,6 +16,9 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Installation/Setup",
@@ -23,7 +26,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.9"
 click = "^8.1.8"
 typer = "^0.15.2"
 pydantic = "^2.6.1"
@@ -45,7 +48,7 @@ mcp-manager = "mcp_manager.cli:main"
 
 [tool.ruff]
 line-length = 105
-target-version = "py312"
+target-version = "py39"
 exclude = ["*.ambr"]
 
 [tool.ruff.lint]

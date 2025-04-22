@@ -2,9 +2,10 @@
 
 # MCP Manager
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://pypi.org/project/mcp-manager/)
+[![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](https://pypi.org/project/mcp-manager/)
 [![Python](https://img.shields.io/badge/python-^3.12-blue.svg)](https://www.python.org/downloads/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Tests](https://github.com/nstebbins/mcp-manager/actions/workflows/test.yml/badge.svg)](https://github.com/nstebbins/mcp-manager/actions/workflows/test.yml)
 
 A powerful CLI tool for managing Model Context Protocol (MCP) servers. Seamlessly install, configure, and manage MCP servers for AI tools and services.
 
@@ -38,11 +39,13 @@ mcp-manager info playwright
 #  •  npm
 
 # Install a server (for Claude Desktop)
-mcp-manager install playwright --client=claude
-
+mcp-manager install playwright --client=claude-desktop
 
 # Install a server (for Cursor)
 mcp-manager install playwright --client=cursor
+
+# Install a server (for Claude Code)
+mcp-manager install playwright --client=claude-code
 ```
 
 ## 🛠️ Available Commands
@@ -51,11 +54,11 @@ mcp-manager install playwright --client=cursor
 |---------|-------------|
 | `search <keyword>` | Search for available MCP servers matching the keyword |
 | `info <server-name>` | Display detailed information about a specific server |
-| `install <server-name> [--client=claude\|cursor]` | Install an MCP server for a specific client |
-| `uninstall <server-name> [--client=claude\|cursor]` | Remove an installed server |
+| `install <server-name> [--client=claude-desktop\|cursor\|claude-code]` | Install an MCP server for a specific client |
+| `uninstall <server-name> [--client=claude-desktop\|cursor\|claude-code]` | Remove an installed server |
 | `list` | List all installed MCP servers |
-| `config path [--client=claude\|cursor]` | Show current client config file path |
-| `config set-path <new-path> [--client=claude\|cursor]` | Set a new path for the client config file |
+| `config path [--client=claude-desktop\|cursor\|claude-code]` | Show current client config file path |
+| `config set-path <new-path> [--client=claude-desktop\|cursor\|claude-code]` | Set a new path for the client config file |
 
 ## 🔌 Available Servers
 
@@ -65,6 +68,7 @@ mcp-manager install playwright --client=cursor
 | **Filesystem** | File system operations server for local file access | Node.js, npm |
 | **Fetch** | Server for making HTTP requests | Docker |
 | **Git** | Server for Git operations | Docker |
+| **GitHub** | Server for GitHub API operations | Docker |
 | **Memory** | Server for managing Claude's memory | Docker |
 
 ## 👥 Supported MCP Clients
@@ -72,7 +76,7 @@ mcp-manager install playwright --client=cursor
 Currently supports:
 - ✅ Claude Desktop (default client)
 - ✅ Cursor
-- 🔄 Additional client support coming soon
+- ✅ Claude Code
 
 ## 🎯 Features
 

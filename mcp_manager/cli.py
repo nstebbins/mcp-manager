@@ -28,11 +28,14 @@ console = Console()
 
 class ClientType(str, Enum):
     CURSOR = "cursor"
-    CLAUDE = "claude"
+    CLAUDE_DESKTOP = "claude-desktop"
+    CLAUDE_CODE = "claude-code"
 
 
 # Define options at module level
-client_option = typer.Option(ClientType.CLAUDE, help="Client type (cursor or claude)")
+client_option = typer.Option(
+    ClientType.CLAUDE_DESKTOP, help="Client type (cursor, claude-desktop, or claude-code)"
+)
 
 
 @app.command()
@@ -126,9 +129,21 @@ def install(
             arg.replace("{user_directory}", user_input) if isinstance(arg, str) else arg
             for arg in mcp_config["args"]
         ]
+        if mcp_config.get("env"):
+            mcp_config["env"] = {
+                key: value.replace("<YOUR_TOKEN>", user_input) if isinstance(value, str) else value
+                for key, value in mcp_config["env"].items()
+            }
 
     config_file = get_config_path(client)
     if not config_file.exists():
+        if client == ClientType.CLAUDE_CODE:
+            console.print(f"[red]Claude Code config file not found at:[/red] {config_file}")
+            console.print(
+                "[yellow]Please ensure Claude Code is installed and configured before installing MCP "
+                "servers.[/yellow]"
+            )
+            return
         console.print(f"[red]Config file not found at:[/red] {config_file}")
         return
 
