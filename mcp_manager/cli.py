@@ -72,10 +72,19 @@ def info(server_name: str):
         console.print(f"[red]Server not found:[/red] {server_name}")
         return
 
-    panel = Panel.fit(
-        f"[bold cyan]Server:[/bold cyan] {server_name}\n"
-        f"[bold]Description:[/bold] {server_info.description}\n"
+    panel_content = [
+        f"[bold cyan]Server:[/bold cyan] {server_name}",
+        f"[bold]Description:[/bold] {server_info.description}",
         f"[bold green]Maintainer:[/bold green] {server_info.maintainer}",
+    ]
+
+    if server_info.dependencies:
+        panel_content.append(
+            f"[bold yellow]Dependencies:[/bold yellow] {', '.join(server_info.dependencies)}"
+        )
+
+    panel = Panel.fit(
+        "\n".join(panel_content),
         title="Server Information",
         border_style="blue",
     )
@@ -86,12 +95,6 @@ def info(server_name: str):
         for config in server_info.required_config:
             config_table.add_row("•", config)
         console.print(config_table)
-
-    if server_info.dependencies:
-        dep_table = Table(title="Dependencies", show_header=False, box=None)
-        for dep in server_info.dependencies:
-            dep_table.add_row("•", dep)
-        console.print(dep_table)
 
 
 @app.command()

@@ -15,12 +15,10 @@
   │ Server: filesystem                                │
   │ Description: MCP server for filesystem operations │
   │ Maintainer: Anthropic                             │
+  │ Dependencies: Node.js, npm                        │
   ╰───────────────────────────────────────────────────╯
                   Required Configuration                 
    •  Allowed directory paths that the server can access 
-  Dependencies
-   •  Node.js 
-   •  npm     
   
   '''
 # ---
@@ -36,10 +34,8 @@
   │ Server: playwright                                             │
   │ Description: MCP server for browser automation with Playwright │
   │ Maintainer: Anthropic                                          │
+  │ Dependencies: Node.js, npm                                     │
   ╰────────────────────────────────────────────────────────────────╯
-  Dependencies
-   •  Node.js 
-   •  npm     
   
   '''
 # ---
