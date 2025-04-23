@@ -14,20 +14,6 @@ cd mcp-manager
 poetry install
 ```
 
-## Basic Configuration
-
-MCP Manager requires minimal configuration to get started. Here's how to set up your environment:
-
-1. **Verify Installation**
-   ```bash
-   mcp-manager --version
-   ```
-
-2. **Check Available Servers**
-   ```bash
-   mcp-manager list
-   ```
-
 ## First Steps
 
 ### 1. Search for Servers

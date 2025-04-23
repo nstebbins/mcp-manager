@@ -6,7 +6,6 @@ Welcome to the documentation for MCP Manager. This guide will help you understan
 
 - [Getting Started](./getting-started.md)
   - Installation
-  - Basic Configuration
   - First Steps
   - Next Steps
 - [Core Concepts](./core-concepts.md)

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mcp-manager"
-version = "0.2.5"
+version = "0.2.6"
 description = "A CLI tool for managing Model Context Protocol (MCP) servers"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
