@@ -15,38 +15,7 @@ A CLI tool that makes MCP server management across Claude Desktop, Cursor, and m
 
 ## 🚀 Quick Start
 
-```bash
-# Install the package
-pip install mcp-manager
-
-# Search for available servers
-mcp-manager search browser
-# ┌───────────┬──────────────────────────────────────────────┬────────────┐
-# │ Server    │ Description                                  │ Maintainer │
-# ├───────────┼──────────────────────────────────────────────┼────────────┤
-# │ playwright│ MCP server for browser automation            │ Anthropic  │
-# └───────────┴──────────────────────────────────────────────┴────────────┘
-
-# Get detailed server information
-mcp-manager info playwright
-# ╭────────────────────── Server Information ──────────────────────╮
-# │ Server: playwright                                             │
-# │ Description: MCP server for browser automation with Playwright │
-# │ Maintainer: Anthropic                                          │
-# ╰────────────────────────────────────────────────────────────────╯
-# Dependencies
-#  •  Node.js
-#  •  npm
-
-# Install a server (for Claude Desktop)
-mcp-manager install playwright --client=claude-desktop
-
-# Install a server (for Cursor)
-mcp-manager install playwright --client=cursor
-
-# Install a server (for Claude Code)
-mcp-manager install playwright --client=claude-code
-```
+![MCP Manager Demo](docs/mcp-manager-demo.gif)
 
 ## 🛠️ Available Commands
 
