@@ -1,6 +1,8 @@
 name: Release
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -46,3 +48,30 @@ jobs:
           body: ${{ steps.tag_version.outputs.changelog }}
           draft: false
           prerelease: false
+
+      - name: Set up Python
+        if: steps.tag_version.outputs.new_tag
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        if: steps.tag_version.outputs.new_tag
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Configure Poetry
+        if: steps.tag_version.outputs.new_tag
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+
+      - name: Update version in pyproject.toml
+        if: steps.tag_version.outputs.new_tag
+        run: |
+          poetry version ${GITHUB_REF#refs/tags/v}
+
+      - name: Build and publish
+        if: steps.tag_version.outputs.new_tag
+        run: |
+          poetry build
+          poetry publish
