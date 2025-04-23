@@ -1,0 +1,55 @@
+# Getting Started with MCP Manager
+
+## Installation
+
+### Using pip (Recommended)
+```bash
+pip install mcp-manager
+```
+
+### From Source
+```bash
+git clone https://github.com/nstebbins/mcp-manager.git
+cd mcp-manager
+poetry install
+```
+
+## Basic Configuration
+
+MCP Manager requires minimal configuration to get started. Here's how to set up your environment:
+
+1. **Verify Installation**
+   ```bash
+   mcp-manager --version
+   ```
+
+2. **Check Available Servers**
+   ```bash
+   mcp-manager list
+   ```
+
+## First Steps
+
+### 1. Search for Servers
+```bash
+mcp-manager search browser
+```
+
+### 2. Get Server Information
+```bash
+mcp-manager info playwright
+```
+
+### 3. Install a Server
+```bash
+mcp-manager install playwright --client=cursor
+```
+
+### 4. Verify Installation
+```bash
+mcp-manager list
+```
+
+## Next Steps
+
+Read about [Core Concepts](./core-concepts.md) to understand MCP architecture

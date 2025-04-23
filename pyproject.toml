@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mcp-manager"
-version = "0.1.1"
+version = "0.2.0"
 description = "A CLI tool for managing Model Context Protocol (MCP) servers"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
@@ -8,7 +8,28 @@ packages = [{include = "mcp_manager"}]
 license = "GPL-3.0-or-later"
 repository = "https://github.com/nstebbins/mcp-manager"
 homepage = "https://github.com/nstebbins/mcp-manager"
-keywords = ["mcp", "cli", "server-management", "ai-tools", "claude"]
+keywords = [
+    "mcp",
+    "cli",
+    "server-management",
+    "ai-tools",
+    "claude",
+    "anthropic",
+    "browser-automation",
+    "playwright",
+    "ai-assistant",
+    "automation",
+    "developer-tools",
+    "llm-tools",
+    "claude-desktop",
+    "cursor-ide",
+    "claude-code",
+    "model-context-protocol",
+    "ai-integration",
+    "server-automation",
+    "development-tools",
+    "productivity"
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",

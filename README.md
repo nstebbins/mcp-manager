@@ -3,11 +3,11 @@
 # MCP Manager
 
 [![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](https://pypi.org/project/mcp-manager/)
-[![Python](https://img.shields.io/badge/python-^3.12-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-^3.9-blue.svg)](https://www.python.org/downloads/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Tests](https://github.com/nstebbins/mcp-manager/actions/workflows/test.yml/badge.svg)](https://github.com/nstebbins/mcp-manager/actions/workflows/test.yml)
 
-A powerful CLI tool for managing Model Context Protocol (MCP) servers. Seamlessly install, configure, and manage MCP servers for AI tools and services.
+A CLI tool that makes MCP server management across Claude Desktop, Cursor, and more dead simple.
 
 [Installation](#-installation) • [Quick Start](#-quick-start) • [Available Servers](#-available-servers) • [Supported MCP Clients](#-supported-mcp-clients)
 

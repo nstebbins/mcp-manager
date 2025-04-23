@@ -96,7 +96,7 @@ def test_dependency_check_playwright(
         # Mock Node.js and npm as not installed
         mock_which.side_effect = lambda cmd: None if cmd in ["node", "npm"] else "/usr/bin/" + cmd
 
-        result = runner.invoke(app, ["install", "playwright", "--client", "claude"])
+        result = runner.invoke(app, ["install", "playwright", "--client", "claude-desktop"])
         assert result.exit_code == 0
         assert "Missing required dependencies" in result.output
         assert result.output == snapshot
@@ -109,7 +109,7 @@ def test_set_config_path_command(runner: CliRunner) -> None:
         mock_exists.return_value = False
         result = runner.invoke(app, ["config", "set-path", new_path])
         assert result.exit_code == 0
-        assert f"Successfully set new claude config path to: {new_path}" in result.output
+        assert f"Successfully set new claude-desktop config path to: {new_path}" in result.output
 
 
 def test_set_config_path_command_cursor(runner: CliRunner) -> None:
